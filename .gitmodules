@@ -1,0 +1,4 @@
+[submodule "HLCS01"]
+	path = HLCS01
+	url = https://github.com/leocpx/HLCS01.git
+	branch = master
