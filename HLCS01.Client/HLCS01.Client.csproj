@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Unity" Version="5.11.10" />
+    <PackageReference Include="Unity.Container" Version="5.11.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HLCS01\HLCS01.Dataprovider\HLCS01.Dataprovider.csproj" />
+    <ProjectReference Include="..\HLCS01\HLCS01.Shared\HLCS01.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
