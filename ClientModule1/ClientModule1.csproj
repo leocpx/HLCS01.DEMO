@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\Users\lataosai\Desktop\HLCS\HLCS01.DEMO\HLCS01.Client\bin\Debug\netcoreapp3.1\Modules\netcoreapp3.1\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SDK\SDK.csproj" />
+    <ProjectReference Include="..\HLCS01\HLCS01.Dataprovider\HLCS01.Dataprovider.csproj" />
+  </ItemGroup>
+
+</Project>

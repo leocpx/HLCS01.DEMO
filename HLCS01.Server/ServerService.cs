@@ -15,7 +15,7 @@ namespace HLCS01.Server
         { }
 
         [MessageConsumer(CommMessage.GET_DATA,true)]
-        public string Version(string v, byte[] d)
+        public string SET_CONSOLE_COMMAND(string v, byte[] d)
         {
             string command = v;
             string result = "";

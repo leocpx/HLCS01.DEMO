@@ -16,6 +16,7 @@ namespace HLCS01.Server
 
         static void Main(string[] args)
         {
+            Console.WriteLine("vHLCS001.8252021.1043");
             Console.WriteLine("Initializing unity...");
             _unityContainer = new UnityContainer();
             _eventAggregator = new EventAggregator();
