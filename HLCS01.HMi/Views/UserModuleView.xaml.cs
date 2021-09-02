@@ -47,16 +47,26 @@ namespace HLCS01.HMi.Views
         }
 
         #region -- METHODS --
+        #region -- PUBLIC --
+        public UserModuleView Clone()
+        {
+            var result = new UserModuleView(eventAggregator,_UserProcessWrapper);
+            return result;
+        }
+        #endregion
         #region -- PRIVATE --
-        private void SaveAction()
+        public void SaveAction()
         {
             if (!Directory.Exists(UserProcessWrapper.UserProcessModulePath))
                 Directory.CreateDirectory(UserProcessWrapper.UserProcessModulePath);
 
-            eventAggregator.GetEvent<OnUserProcessModuleSave>().Publish();
+            eventAggregator.GetEvent<OnUserProcessModuleSave>().Publish(_UserProcessWrapper);
             _UserProcessWrapper.UserProcessName = UserProcessName;
             var data = MessagePack.MessagePackSerializer.Serialize<UserProcessWrapper>(_UserProcessWrapper);
             File.WriteAllBytes(UserProcessWrapper.UserProcessModulePath + $@"\{UserProcessName}.upm", data);
+
+            if (File.Exists(UserProcessWrapper.UserProcessModulePath + $@"\new user process.upm"))
+                File.Delete(UserProcessWrapper.UserProcessModulePath + $@"\new user process.upm");
         }
         #endregion
         #endregion

@@ -57,10 +57,14 @@ namespace HLCS01.SDK
                 "        return true;\n" +
                 "    }\n" +
             "}\n";
+
+        [MessagePack.Key(3)]
+        public List<UserProcessWrapper> UserProcessWrapperCollection { get; set; } = new List<UserProcessWrapper>();
         #endregion
 
         #region -- PRIVATE --
-        private List<IUserCode> ImportedModules = new List<IUserCode>();
+        [MessagePack.IgnoreMember]
+        public static List<IUserCode> ImportedModules = new List<IUserCode>();
         private IUserCode[] _importedModules => ImportedModules.ToArray();
         private IEventAggregator _eventAggregator { get; set; }
         private object _compiledObject { get; set; }
@@ -84,7 +88,8 @@ namespace HLCS01.SDK
             _eventAggregator.GetEvent<OnProvideModuleInstance>().Subscribe(
                 m =>
                 {
-                    ImportedModules.Add(m);
+                    if(!ImportedModules.Contains(m))
+                        ImportedModules.Add(m);
                 });
             LoadImportedModules();
             ExecuteCode = GetCompiledExecutionCode();
@@ -96,7 +101,8 @@ namespace HLCS01.SDK
             _eventAggregator.GetEvent<OnProvideModuleInstance>().Subscribe(
                 m =>
                 {
-                    ImportedModules.Add(m);
+                    if(!ImportedModules.Contains(m))
+                        ImportedModules.Add(m);
                 });
             LoadImportedModules();
             ExecuteCode = GetCompiledExecutionCode();
@@ -115,8 +121,19 @@ namespace HLCS01.SDK
         }
         public bool ExecuteUserCode()
         {
-            return ExecuteCode != null ? ExecuteCode(_importedModules) : true;
+            CompileExecutionCode();
+            ExecuteCode?.Invoke(_importedModules);
+
+            var name = UserProcessName;
+            foreach (var subCode in UserProcessWrapperCollection)
+            {
+                subCode?.SetEventAggregator(_eventAggregator);
+                subCode?.ExecuteUserCode();
+            }
+
+            return true;
         }
+
         public void LoadImportedModules()
         {
             _eventAggregator.GetEvent<OnRequestModuleInstance>().Publish();

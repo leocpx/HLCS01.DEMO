@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="45" d:DesignWidth="250" MinHeight="25">
     <Grid Background="#FF3E3E42">
-        <TextBlock Foreground="LightGray" Text="{Binding ControllerModuleName}"/>
+        <TextBlock Foreground="LightGray" Background="#FF3F3F46" Text="{Binding ControllerModuleName}"/>
     </Grid>
 </UserControl>

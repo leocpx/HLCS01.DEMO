@@ -9,5 +9,7 @@ namespace HLCS01.SDK
     public class OnProvideModuleInstance : PubSubEvent<ControllerModule> { }
 
     public class OnMessageProvided : PubSubEvent<string> { }
-    public class OnUserProcessModuleSave : PubSubEvent { }
+    public class OnUserProcessModuleSave : PubSubEvent<UserProcessWrapper> { }
+
+    public class OnFileDropped: PubSubEvent<string> { }
 }

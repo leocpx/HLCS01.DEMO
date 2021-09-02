@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SDK\SDK.csproj" />
-    <ProjectReference Include="..\..\TestEngine\TestEngine.csproj" />
+
     <ProjectReference Include="..\HLCS01\HLCS01.Dataprovider\HLCS01.Dataprovider.csproj" />
     <ProjectReference Include="..\HLCS01\HLCS01.Shared\HLCS01.Shared.csproj" />
   </ItemGroup>
