@@ -23,15 +23,15 @@ namespace HLCS01.HMi.ViewModels
         #region -- PUBLIC --
         #region -- BINDED --
         #region -- ICOMMANDS --
-        public DelegateCommand SaveProcessCommand { get; set; }
-        public DelegateCommand DeleteUserProcessModuleCommand { get; set; }
-        public DelegateCommand CreateUserProcessModuleCommand { get; set; }
-        public DelegateCommand AddCommand { get; set; }
-        public DelegateCommand RemoveCommand { get; set; }
-        public DelegateCommand CompileCommand { get; set; }
+        public DelegateCommand SaveProcessCommand { get; set; } 
+        public DelegateCommand DeleteUserProcessModuleCommand { get; set; } 
+        public DelegateCommand CreateUserProcessModuleCommand { get; set; } 
+        public DelegateCommand AddCommand { get; set; } 
+        public DelegateCommand RemoveCommand { get; set; } 
+        public DelegateCommand CompileCommand { get; set; } 
         public DelegateCommand RunCommand { get; set; } 
         #endregion
-        public bool EditMode { get; set; }
+        public bool EditMode { get; set; } 
         public UserModuleView SelectedUserProcessModule
         {
             get => _selectedUserProcessModule;
@@ -172,7 +172,6 @@ namespace HLCS01.HMi.ViewModels
 
                     var newUserProcessModuleView = new UserModuleView(_eventAggregator, reconstructed);
                     UserProcessModules.Add(newUserProcessModuleView);
-
                 });
         }
         private void InitCommandDelegates()
@@ -256,7 +255,6 @@ namespace HLCS01.HMi.ViewModels
 
                     var data = MessagePack.MessagePackSerializer.Serialize<UserProcessWrapper>(upw);
                     File.WriteAllBytes(UserProcessWrapper.UserProcessModulePath + $@"\{upw.UserProcessName}.upm", data);
-
                 });
         }
         #region -- COMMAND ACTIONS --
@@ -290,7 +288,9 @@ namespace HLCS01.HMi.ViewModels
                     try
                     {
                         RaisePropertyChanged(nameof(CodeErrors));
+                        _selectedUserProcessModule.ProgressValue=0;
                         _selectedUserProcessModule._UserProcessWrapper.SetEventAggregator(_eventAggregator);
+                        _selectedUserProcessModule._UserProcessWrapper.ClearProgress();
                         bool result = _selectedUserProcessModule._UserProcessWrapper.ExecuteUserCode();
                     }
                     catch (Exception ex)
@@ -353,7 +353,13 @@ namespace HLCS01.HMi.ViewModels
 
         public void Drop(IDropInfo dropInfo)
         {
-            UserProcess.Add((dropInfo.Data as UserModuleView).Clone());
+            if(!dropInfo.IsSameDragDropContextAsSource)
+                UserProcess.Add((dropInfo.Data as UserModuleView).Clone());
+            else
+            {
+                UserProcess.Remove((UserModuleView)dropInfo.Data);
+                UserProcess.Insert(dropInfo.InsertIndex,(UserModuleView)dropInfo.Data);
+            }
         }
         #endregion
         #endregion

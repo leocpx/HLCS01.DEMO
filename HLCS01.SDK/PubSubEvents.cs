@@ -12,4 +12,7 @@ namespace HLCS01.SDK
     public class OnUserProcessModuleSave : PubSubEvent<UserProcessWrapper> { }
 
     public class OnFileDropped: PubSubEvent<string> { }
+
+    public class OnCodeRunProgressed: PubSubEvent<UserProcessWrapper> { }
+
 }

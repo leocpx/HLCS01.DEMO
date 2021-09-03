@@ -60,6 +60,9 @@ namespace HLCS01.SDK
 
         [MessagePack.Key(3)]
         public List<UserProcessWrapper> UserProcessWrapperCollection { get; set; } = new List<UserProcessWrapper>();
+
+        [MessagePack.Key(4)]
+        public int CodeRunProgress { get; set; } = 0;
         #endregion
 
         #region -- PRIVATE --
@@ -114,15 +117,35 @@ namespace HLCS01.SDK
 
         #region -- PUBLIC --
 
+        public void ClearProgress()
+        {
+            CodeRunProgress = 0;
+            UserProcessWrapperCollection.ForEach(upw => upw.ClearProgress());
+            return;
+        }
+
         public void CompileExecutionCode()
         {
             ExecuteCode = GetCompiledExecutionCode();
-
         }
+
+        public int CodeProgress()
+        {
+            var result = CodeRunProgress;
+            foreach (var item in UserProcessWrapperCollection)
+            {
+                result += item.CodeProgress();
+            }
+            return result;
+        }
+
         public bool ExecuteUserCode()
         {
             CompileExecutionCode();
             ExecuteCode?.Invoke(_importedModules);
+            CodeRunProgress++;
+            _eventAggregator.GetEvent<OnCodeRunProgressed>().Publish(this);
+
 
             var name = UserProcessName;
             foreach (var subCode in UserProcessWrapperCollection)
@@ -131,7 +154,33 @@ namespace HLCS01.SDK
                 subCode?.ExecuteUserCode();
             }
 
+
             return true;
+        }
+
+        public bool OwnsThisChild(UserProcessWrapper upw)
+        {
+            if (upw.UserProcessName == UserProcessName)
+                return true;
+            
+            foreach (var item in UserProcessWrapperCollection)
+            {
+                if (item.OwnsThisChild(upw))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public int GetTotalProcessCount()
+        {
+            var result = 1;
+            _ = UserProcessName;
+            foreach (var item in UserProcessWrapperCollection)
+            {
+                result += item.GetTotalProcessCount();
+            }
+            return result;
         }
 
         public void LoadImportedModules()

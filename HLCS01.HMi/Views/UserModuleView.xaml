@@ -5,9 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:HLCS01.HMi.Views"
              mc:Ignorable="d" 
-              d:DesignHeight="45" d:DesignWidth="250" MinHeight="45">
+              d:DesignHeight="75" d:DesignWidth="250" MinHeight="65">
     <Grid Background="#FF333337" Margin="0,2,0,0">
         <TextBox Foreground="LightGray"  Background="#FF3F3F46" VerticalAlignment="Top" Margin="5" Text="{Binding UserProcessName}" Width="150" Height="20" HorizontalAlignment="Left"/>
         <Button VerticalAlignment="Top" Content="Save" HorizontalAlignment="Right" Width="50" Height="20" Margin="5" Command="{Binding SaveCommand}"/>
+        <ProgressBar Margin="5,0,5,0" VerticalAlignment="Bottom" Height="20" Minimum="0" Maximum="{Binding ProgressMaxValue}" Value="{Binding ProgressValue}"/>
+        <TextBlock FontWeight="ExtraBlack" VerticalAlignment="Bottom" FontSize="15" Foreground="Black" HorizontalAlignment="Center" Text="{Binding ProgressLabel}"/>
     </Grid>
 </UserControl>

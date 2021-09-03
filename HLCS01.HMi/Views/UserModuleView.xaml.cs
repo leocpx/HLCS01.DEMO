@@ -25,14 +25,30 @@ namespace HLCS01.HMi.Views
     /// </summary>
     public partial class UserModuleView : UserControl, INotifyPropertyChanged
     {
-        #region -- PROPERTIES --
-        #region -- PUBLIC --
-        public ICommand SaveCommand => new DefaultCommand(SaveAction, () => true);
+        #region -- PROPERTIES -- 
+        #region -- PUBLIC -- 
+        public string ProgressLabel { get; set; } = "0/0";
+        public int ProgressMaxValue { get; set; } = 1;
+        public int ProgressValue { get; set; } = 0;
+        public ICommand SaveCommand => new DefaultCommand(SaveAction, () => true); 
         public string UserProcessName { get; set; } 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public UserProcessWrapper _UserProcessWrapper { get; set; }
-        #endregion
-        #region -- PRIVATE --
+        public event PropertyChangedEventHandler PropertyChanged; 
+        public UserProcessWrapper _UserProcessWrapper
+        {
+            get => _userProcessWrapper;
+            set
+            {
+                _userProcessWrapper = value;
+                ProgressMaxValue = value.GetTotalProcessCount();
+                ProgressLabel = $"{ProgressValue}/{ProgressMaxValue}";
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressMaxValue)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressValue)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressLabel)));
+            }
+        }
+        private UserProcessWrapper _userProcessWrapper;
+        #endregion 
+        #region -- PRIVATE -- 
         private IEventAggregator eventAggregator;
         #endregion
         #endregion
@@ -40,28 +56,56 @@ namespace HLCS01.HMi.Views
         {
             this.eventAggregator = eventAggregator;
             InitializeComponent();
-            DataContext = this;
+            DataContext = this; 
             _UserProcessWrapper = userProcessWrapper;
             UserProcessName = _UserProcessWrapper.UserProcessName;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UserProcessName)));
-        }
 
-        #region -- METHODS --
-        #region -- PUBLIC --
-        public UserModuleView Clone()
-        {
-            var result = new UserModuleView(eventAggregator,_UserProcessWrapper);
-            return result;
-        }
-        #endregion
-        #region -- PRIVATE --
-        public void SaveAction()
-        {
-            if (!Directory.Exists(UserProcessWrapper.UserProcessModulePath))
-                Directory.CreateDirectory(UserProcessWrapper.UserProcessModulePath);
+            _ = eventAggregator.GetEvent<OnCodeRunProgressed>().Subscribe(
+                upw =>
+                {
+                    if(_UserProcessWrapper.OwnsThisChild(upw))
+                    {
+                        _ = upw.UserProcessName;
+                        _ = _UserProcessWrapper.UserProcessName;
+                        ProgressMaxValue = _UserProcessWrapper.GetTotalProcessCount();//_UserProcessWrapper.UserProcessWrapperCollection.Count() + 1;
+                        //ProgressValue++;
+                        ProgressValue = _UserProcessWrapper.CodeProgress();
 
-            eventAggregator.GetEvent<OnUserProcessModuleSave>().Publish(_UserProcessWrapper);
-            _UserProcessWrapper.UserProcessName = UserProcessName;
+                        ProgressLabel = $"{ProgressValue}/{ProgressMaxValue}";
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressMaxValue)));
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressValue)));
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressLabel)));
+                    }
+                    else
+                    {
+                        //ProgressMaxValue = _UserProcessWrapper.GetTotalProcessCount();//_UserProcessWrapper.UserProcessWrapperCollection.Count() + 1;
+                        //ProgressValue = _UserProcessWrapper.CodeProgress();
+                        //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressMaxValue)));
+                        //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressValue)));
+                        //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ProgressLabel)));
+                    }
+                });
+        } 
+
+
+
+        #region -- METHODS -- 
+        #region -- PUBLIC -- 
+        public UserModuleView Clone() 
+        { 
+            var result = new UserModuleView(eventAggregator,_UserProcessWrapper); 
+            return result; 
+        } 
+        #endregion 
+        #region -- PRIVATE -- 
+        public void SaveAction() 
+        { 
+            if (!Directory.Exists(UserProcessWrapper.UserProcessModulePath)) 
+                Directory.CreateDirectory(UserProcessWrapper.UserProcessModulePath); 
+             
+            eventAggregator.GetEvent<OnUserProcessModuleSave>().Publish(_UserProcessWrapper); 
+            _UserProcessWrapper.UserProcessName = UserProcessName; 
             var data = MessagePack.MessagePackSerializer.Serialize<UserProcessWrapper>(_UserProcessWrapper);
             File.WriteAllBytes(UserProcessWrapper.UserProcessModulePath + $@"\{UserProcessName}.upm", data);
 
